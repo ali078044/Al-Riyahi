@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>واجهة المدرس - اعدادية الرياحي للبنين</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --primary-color: #28a745; --light-green: #eafaf1; --border-color: #dee2e6; }
+        body { font-family: 'Tajawal', sans-serif; background-color: #f4f7f9; margin: 0; }
+        .header { background-color: var(--primary-color); color: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .header h1 { margin: 0; font-size: 1.5em; }
+        .user-info { display: flex; align-items: center; gap: 15px; }
+        #logoutBtn { background: transparent; border: 1px solid white; color: white; padding: 8px 15px; border-radius: 5px; cursor: pointer; }
+        .container { max-width: 1200px; margin: 20px auto; padding: 0 20px; }
+        .tabs { display: flex; flex-wrap: wrap; border-bottom: 2px solid var(--border-color); margin-bottom: 20px; }
+        .tab-button { padding: 15px 25px; cursor: pointer; background: none; border: none; font-size: 1.1em; font-weight: bold; color: #555; position: relative; }
+        .tab-button.active { color: var(--primary-color); }
+        .tab-button.active::after { content: ''; position: absolute; bottom: -2px; left: 0; right: 0; height: 3px; background-color: var(--primary-color); }
+        .tab-content { display: none; background: white; padding: 25px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); animation: fadeIn 0.5s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .controls { display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 20px; padding: 15px; background: var(--light-green); border-radius: 8px; align-items: center; }
+        .controls select, .controls input, .controls button { padding: 10px; border-radius: 5px; border: 1px solid var(--border-color); font-family: 'Tajawal', sans-serif; font-size: 1em; }
+        .controls button { background-color: var(--primary-color); color: white; cursor: pointer; font-weight: bold; border: none; }
+        .data-table { width: 100%; border-collapse: collapse; }
+        .data-table th, .data-table td { padding: 10px; text-align: center; border: 1px solid var(--border-color); }
+        .data-table thead { background-color: var(--light-green); }
+        .data-table input[type="number"], .data-table input[type="text"], .data-table select { width: 90%; text-align: center; border: 1px solid #ccc; border-radius: 4px; padding: 5px; box-sizing: border-box; }
+        .data-table input:disabled { background: #f2f2f2; cursor: not-allowed; }
+        .status { font-weight: bold; color: #007bff; }
+        .button { padding: 12px 25px; background: var(--primary-color); color: white; border: none; border-radius: 5px; font-size: 1.1em; cursor: pointer; }
+        #submitGradesBtn, #submitAbsencesBtn, #submitEvaluationsBtn { display: none; margin-top: 20px; }
+        .form-section { padding: 20px; border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 20px; }
+        .form-section h3 { margin-top: 0; }
+        .form-section input, .form-section textarea, .form-section select { width: 100%; padding: 10px; box-sizing: border-box; margin-bottom: 10px; border-radius: 5px; border: 1px solid var(--border-color); }
+        .students-list { list-style: none; padding: 0; column-count: 3; -webkit-column-count: 3; -moz-column-count: 3; }
+        .students-list li { padding: 8px; }
+        .card { background: #fff; border: 1px solid var(--border-color); border-radius: 8px; padding: 15px; box-shadow: 0 1px 4px rgba(0,0,0,0.05); margin-bottom: 15px; }
+        .card h4 { margin-top: 0; }
+        .card.announcement-card { border-right: 5px solid var(--primary-color); }
+        .table-responsive { overflow-x: auto; }
+        .weekly-schedule-table th, .weekly-schedule-table td { padding: 10px; }
+        .my-subject {
+            background-color: var(--light-green);
+            font-weight: bold;
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+        }
+    </style>
+</head>
+<body class="teacher-page">
+    <header class="header">
+        <h1>لوحة تحكم المدرس</h1>
+        <div class="user-info"><span id="userName"></span><button id="logoutBtn"><i class="fas fa-sign-out-alt"></i> تسجيل الخروج</button></div>
+    </header>
+    <div class="container">
+        <div class="tabs">
+            <button class="tab-button" onclick="showTab('gradesTab')"><i class="fas fa-edit"></i> الدرجات</button>
+            <button class="tab-button" onclick="showTab('scheduleTab')"><i class="fas fa-calendar-week"></i> جدولي الأسبوعي</button>
+            <button class="tab-button" onclick="showTab('absencesTab')"><i class="fas fa-user-check"></i> الغياب</button>
+            <button class="tab-button" onclick="showTab('homeworkEvalTab')"><i class="fas fa-tasks"></i> الواجبات والتقييمات</button>
+            <button class="tab-button" onclick="showTab('libraryTab')"><i class="fas fa-book-open"></i> المكتبة الرقمية</button>
+            <button class="tab-button" onclick="showTab('announcementsTab')"><i class="fas fa-bullhorn"></i> آخر الأخبار</button>
+        </div>
+
+        <div id="gradesTab" class="tab-content">
+            <h2>إدخال ومراجعة الدرجات</h2>
+            <div class="controls">
+                <select id="teacherClasses"></select><select id="teacherSections"></select><select id="teacherSubjects"></select>
+                <button id="loadStudentsBtn">تحميل الطلاب</button>
+            </div>
+            <form id="gradesForm">
+                <div id="studentsGradeContainer"><p>الرجاء اختيار الصف والشعبة والمادة لعرض الطلاب.</p></div>
+                <button id="submitGradesBtn" type="submit" class="button">إرسال الدرجات للمراجعة</button>
+            </form>
+        </div>
+
+        <div id="scheduleTab" class="tab-content">
+            <h2>جدولي الأسبوعي</h2>
+            <div id="teacherScheduleContainer"><p>جاري تحميل الجداول...</p></div>
+        </div>
+
+        <div id="absencesTab" class="tab-content">
+             <h2>تسجيل الغياب</h2>
+             <form id="absenceForm">
+                <div class="controls">
+                    <select id="absenceClasses"></select><select id="absenceSections"></select><input type="date" id="absenceDate" required>
+                    <button type="button" id="loadStudentsForAbsenceBtn">تحميل الطلاب</button>
+                </div>
+                <div id="studentsForAbsenceContainer"><p>الرجاء اختيار الصف والشعبة والتاريخ لعرض الطلاب.</p></div>
+                <div style="margin-top: 15px;">
+                    <label for="absenceNotes">ملاحظات (اختياري):</label>
+                    <input type="text" id="absenceNotes" style="width: 100%; padding: 8px; box-sizing: border-box;">
+                </div>
+                <button id="submitAbsencesBtn" type="submit" class="button">إرسال الغياب للمراجعة</button>
+            </form>
+        </div>
+
+        <div id="homeworkEvalTab" class="tab-content">
+            <h2>إرسال واجب أو تسجيل تقييم</h2>
+            <div class="form-section">
+                <h3><i class="fas fa-pencil-alt"></i> إرسال واجب أو تبليغ</h3>
+                <form id="homeworkForm">
+                    <div class="controls"><select id="hwClasses" required></select><select id="hwSections" required></select><select id="hwSubjects" required></select></div>
+                    <textarea id="hwContent" rows="4" placeholder="اكتب نص الواجب أو التبليغ هنا..." required></textarea>
+                    <button type="submit" class="button">إرسال الواجب</button>
+                </form>
+            </div>
+            <hr>
+            <div class="form-section">
+                <h3><i class="fas fa-user-graduate"></i> تسجيل تقييم يومي</h3>
+                <form id="evaluationsForm">
+                    <div class="controls">
+                        <select id="evalClasses"></select>
+                        <select id="evalSections"></select>
+                        <select id="evalSubjects"></select>
+                        <input type="date" id="evalDate" required>
+                        <button type="button" id="loadStudentsForEvalBtn">تحميل الطلاب</button>
+                    </div>
+                    <div id="studentsForEvalContainer"><p>الرجاء اختيار الصف والشعبة والمادة والتاريخ لعرض الطلاب.</p></div>
+                    <button id="submitEvaluationsBtn" type="submit" class="button">إرسال التقييمات للمراجعة</button>
+                </form>
+            </div>
+        </div>
+
+        <div id="libraryTab" class="tab-content">
+            <h2>إضافة رابط للمكتبة الرقمية</h2>
+            <form id="libraryForm">
+                <div class="form-section">
+                    <div class="controls"><select id="libClasses" required></select><select id="libSubjects" required></select></div>
+                    <input type="text" id="libTitle" placeholder="عنوان المادة (مثال: شرح موضوع المتتابعات)" required>
+                    <input type="url" id="libUrl" placeholder="الرابط (URL)" required>
+                    <textarea id="libDescription" rows="3" placeholder="وصف بسيط (اختياري)"></textarea>
+                    <button type="submit" class="button">إضافة للمكتبة</button>
+                </div>
+            </form>
+        </div>
+        
+        <div id="announcementsTab" class="tab-content">
+             <h2>آخر الأخبار والإعلانات</h2>
+             <div id="announcementsContainer" class="card-container"><p>جاري تحميل الإعلانات...</p></div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
+

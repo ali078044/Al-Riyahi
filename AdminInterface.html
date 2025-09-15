@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة تحكم المشرف - اعدادية الرياحي للبنين</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --primary-color: #dc3545; --light-red: #f8d7da; --border-color: #dee2e6; }
+        body { font-family: 'Tajawal', sans-serif; background-color: #f4f7f9; margin: 0; }
+        .header { background-color: var(--primary-color); color: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        h1, h2, h3 { margin: 0 0 20px 0; }
+        .user-info { display: flex; align-items: center; gap: 15px; }
+        #logoutBtn { background: transparent; border: 1px solid white; color: white; padding: 8px 15px; border-radius: 5px; cursor: pointer; }
+        .container { max-width: 1200px; margin: 20px auto; padding: 0 20px; }
+        .tabs { display: flex; flex-wrap: wrap; border-bottom: 2px solid var(--border-color); margin-bottom: 20px; }
+        .tab-button { padding: 15px 25px; cursor: pointer; background: none; border: none; font-size: 1.1em; font-weight: bold; color: #555; position: relative; }
+        .tab-button.active { color: var(--primary-color); }
+        .tab-button.active::after { content: ''; position: absolute; bottom: -2px; left: 0; right: 0; height: 3px; background-color: var(--primary-color); }
+        .tab-content { display: none; background: white; padding: 25px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); animation: fadeIn 0.5s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .button { background-color: var(--primary-color); color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-size: 1em; }
+        .data-table { width: 100%; border-collapse: collapse; }
+        .data-table th, .data-table td { padding: 12px; text-align: right; border: 1px solid var(--border-color); }
+        .data-table thead { background-color: var(--light-red); }
+        .details-toggle { cursor: pointer; color: var(--primary-color); font-weight: bold; }
+        .changes-details { background-color: #f9f9f9; padding: 10px; border-radius: 5px; margin-top: 5px; }
+        .changes-details span { font-weight: bold; }
+        .changes-details .old-value { text-decoration: line-through; color: #999; margin-left: 5px; }
+        .changes-details .new-value { color: green; }
+        .setting-item { display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 1px solid #eee; }
+        .switch { position: relative; display: inline-block; width: 60px; height: 34px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 26px; width: 26px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--primary-color); }
+        input:checked + .slider:before { transform: translateX(26px); }
+        .form-section { padding: 20px; border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 20px; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; }
+        .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 5px; box-sizing: border-box; }
+        .table-responsive { overflow-x: auto; }
+        .controls { display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 10px; align-items: center; }
+        .controls select, .controls input, .controls button { padding: 10px; border-radius: 5px; border: 1px solid var(--border-color); font-size: 1em; }
+        .schedule-grid { display: grid; grid-template-columns: 100px repeat(6, 1fr); gap: 5px; margin-bottom: 5px; }
+        .schedule-grid .schedule-header, .schedule-grid select { width: 100%; box-sizing: border-box; padding: 8px; font-size: 0.9em; text-align: center; border: 1px solid #ccc; border-radius: 4px; }
+        .schedule-header { font-weight: bold; background: #f2f2f2; }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1>لوحة تحكم المشرف</h1>
+        <div class="user-info">
+            <span id="userName"></span>
+            <button id="logoutBtn"><i class="fas fa-sign-out-alt"></i> تسجيل الخروج</button>
+        </div>
+    </header>
+    <div class="container">
+        <div class="tabs">
+            <button class="tab-button" onclick="showTab('gradesApprovalTab')"><i class="fas fa-check-double"></i> مراجعة الدرجات</button>
+            <button class="tab-button" onclick="showTab('absencesApprovalTab')"><i class="fas fa-user-clock"></i> مراجعة الغيابات</button>
+            <button class="tab-button" onclick="showTab('evaluationsApprovalTab')"><i class="fas fa-user-graduate"></i> مراجعة التقييمات</button>
+            <button class="tab-button" onclick="showTab('announcementTab')"><i class="fas fa-bullhorn"></i> نشر إعلان</button>
+            <button class="tab-button" onclick="showTab('schedulesTab')"><i class="fas fa-calendar-alt"></i> نشر الجداول</button>
+            <button class="tab-button" onclick="showTab('usersTab')"><i class="fas fa-users-cog"></i> إدارة المستخدمين</button>
+            <button class="tab-button" onclick="showTab('settingsTab')"><i class="fas fa-cog"></i> إعدادات النظام</button>
+        </div>
+
+        <div id="gradesApprovalTab" class="tab-content">
+            <h2>الدرجات بانتظار الموافقة</h2>
+            <div id="pendingGradesContainer"><p>جاري تحميل الدرجات...</p></div>
+        </div>
+
+        <div id="absencesApprovalTab" class="tab-content">
+            <h2>الغيابات بانتظار الموافقة</h2>
+            <div id="pendingAbsencesContainer"><p>جاري تحميل الغيابات...</p></div>
+        </div>
+        
+        <div id="evaluationsApprovalTab" class="tab-content">
+            <h2>التقييمات بانتظار الموافقة</h2>
+            <div id="pendingEvaluationsContainer"><p>جاري تحميل التقييمات...</p></div>
+        </div>
+
+        <div id="announcementTab" class="tab-content">
+            <h2>إرسال إعلان جديد</h2>
+            <form id="announcementForm">
+                <div class="form-group"><label for="annAudience">إرسال إلى:</label><select id="annAudience"><option value="الكل">الكل</option><option value="الطلاب فقط">الطلاب فقط</option><option value="المدرسين فقط">المدرسين فقط</option></select></div>
+                <div class="form-group"><label for="annTitle">عنوان الإعلان:</label><input type="text" id="annTitle" required></div>
+                <div class="form-group"><label for="annContent">نص الإعلان:</label><textarea id="annContent" rows="5" required></textarea></div>
+                <button type="submit" class="button">نشر الإعلان</button>
+            </form>
+        </div>
+
+        <div id="schedulesTab" class="tab-content">
+            <h2>نشر الجداول</h2>
+            <div class="form-section">
+                <h3><i class="fas fa-tasks"></i> نشر جدول الامتحانات</h3>
+                <form id="examScheduleForm">
+                    <div class="form-group"><label for="examScheduleTitle">عنوان الجدول:</label><input type="text" id="examScheduleTitle" placeholder="مثال: امتحانات الشهر الأول - الفصل الأول" required></div>
+                    <div class="form-group"><label for="examScheduleClass">الصف المستهدف:</label><select id="examScheduleClass" required></select></div>
+                    <h4>أيام الامتحانات:</h4>
+                    <div id="examDaysContainer"></div>
+                    <button type="button" id="addExamDayBtn" class="button" style="background-color: #007bff; margin-top: 10px;">إضافة يوم جديد</button>
+                    <hr style="margin: 20px 0;">
+                    <button type="submit" class="button">نشر جدول الامتحانات</button>
+                </form>
+            </div>
+            <hr>
+            <div class="form-section">
+                <h3><i class="fas fa-calendar-week"></i> نشر/تحديث الجدول الأسبوعي</h3>
+                <form id="weeklyScheduleForm">
+                    <div class="controls">
+                        <select id="weeklyScheduleClass" required></select>
+                        <input type="text" id="weeklyScheduleSection" placeholder="الشعبة (مثال: أ)" required>
+                        <button type="button" id="loadWeeklyScheduleBtn" class="button" style="background-color: #17a2b8;">تحميل الجدول</button>
+                    </div>
+                    <div id="weeklyScheduleContainer"></div>
+                    <button type="submit" class="button" style="margin-top: 20px;">حفظ الجدول الأسبوعي</button>
+                </form>
+            </div>
+        </div>
+
+        <div id="usersTab" class="tab-content">
+            <h2>إدارة المستخدمين والصلاحيات</h2>
+            <div id="usersContainer"><p>جاري تحميل قائمة المستخدمين...</p></div>
+        </div>
+
+        <div id="settingsTab" class="tab-content">
+            <h2>صلاحيات إدخال الدرجات</h2>
+            <div id="settingsContainer"><p>جاري تحميل الإعدادات...</p></div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
+
