@@ -2,7 +2,7 @@
 //                     الإعدادات الرئيسية
 // ==========================================================
 // !!! تنبيه هام: هذا هو رابط النشر الجديد الذي زودتني به
-const API_URL = 'https://script.google.com/macros/s/AKfycbydd66W-72Tpcg6ah0DLl-RuGEntdmpPLbDBGjcVZeBIzvU2I6LHgr5go5guBzlyvAs/exec'; 
+const API_URL = 'https://script.google.com/macros/s/AKfycbw1hZKANezp8Qi6L-gjNt3VenEHDBfx2qeFq1L3g_hbV0qHeOe3IRVOJ8j0P3DpqLU3/exec'; 
 
 // (جديد) تعريف أسماء الصفحات لمطابقة الخادم
 const SHEETS = {
