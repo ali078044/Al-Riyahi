@@ -2,11 +2,18 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
+    <!-- (جديد) تمت إضافة هذا السطر لجعل الصفحة متجاوبة مع الموبايل -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>واجهة الطالب - اعدادية الرياحي للبنين</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root { --primary-color: #007bff; --light-blue: #f0f8ff; --border-color: #dee2e6; }
+        
+        /* (جديد) ضمان أن كل العناصر تحسب الحواف والـ padding ضمن العرض المحدد */
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
         body { font-family: 'Tajawal', sans-serif; background-color: #f4f7f9; margin: 0; }
         .header { background-color: var(--primary-color); color: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         .header h1 { margin: 0; font-size: 1.5em; }
@@ -14,9 +21,8 @@
         #logoutBtn { background: transparent; border: 1px solid white; color: white; padding: 8px 15px; border-radius: 5px; cursor: pointer; }
         .container { max-width: 1200px; margin: 20px auto; padding: 0 20px; }
         .tabs { display: flex; flex-wrap: wrap; border-bottom: 2px solid var(--border-color); margin-bottom: 20px; }
-        .tab-button { padding: 15px 25px; cursor: pointer; background: none; border: none; font-size: 1.1em; font-weight: bold; color: #555; position: relative; }
-        .tab-button.active { color: var(--primary-color); }
-        .tab-button.active::after { content: ''; position: absolute; bottom: -2px; left: 0; right: 0; height: 3px; background-color: var(--primary-color); }
+        .tab-button { padding: 15px 25px; cursor: pointer; background: none; border: none; font-size: 1.1em; font-weight: bold; color: #555; position: relative; border-bottom: 3px solid transparent; }
+        .tab-button.active { color: var(--primary-color); border-bottom-color: var(--primary-color); }
         .tab-content { display: none; background: white; padding: 25px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); animation: fadeIn 0.5s; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         .data-table { width: 100%; border-collapse: collapse; font-size: 0.9em; }
@@ -35,6 +41,27 @@
         .exam-schedule-card h3 { border-bottom: 2px solid var(--primary-color); padding-bottom: 10px; }
         .exam-schedule-card ul { list-style: none; padding: 0; }
         .exam-schedule-card li { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee; }
+        
+        /* (جديد) التوافق مع الموبايل */
+        @media (max-width: 768px) {
+            body { padding: 0; }
+            .container { padding: 0 10px; margin-top: 10px; }
+            .header { padding: 15px; flex-direction: column; gap: 10px; text-align: center; }
+            .header h1 { font-size: 1.2em; }
+            .tabs { justify-content: center; }
+            .tab-button { padding: 12px 8px; font-size: 0.8em; flex-grow: 1; text-align: center; }
+            .tab-content { padding: 15px; }
+
+            .data-table { font-size: 0.8em; } /* تصغير الخط في الجداول */
+            .data-table th, .data-table td { padding: 5px; } /* تقليل الحشو */
+            
+            /* (جديد) جعل قائمة الامتحانات أصغر */
+            .exam-schedule-card li { flex-direction: column; align-items: flex-start; gap: 5px; }
+
+            /* (جديد) جعل الكروت بعمود واحد */
+            .card-container { grid-template-columns: 1fr; }
+        }
+
     </style>
 </head>
 <body class="student-page">
@@ -48,8 +75,8 @@
             <button class="tab-button" onclick="showTab('gradesTab')"><i class="fas fa-graduation-cap"></i> درجاتي</button>
             <button class="tab-button" onclick="showTab('schedulesMainTab')"><i class="fas fa-calendar-alt"></i> الجداول</button>
             <button class="tab-button" onclick="showTab('absencesTab')"><i class="fas fa-user-check"></i> غياباتي</button>
-            <button class="tab-button" onclick="showTab('homeworkEvalTab')"><i class="fas fa-tasks"></i> الواجبات والتقييمات</button>
-            <button class="tab-button" onclick="showTab('libraryTab')"><i class="fas fa-book-open"></i> المكتبة الرقمية</button>
+            <button class="tab-button" onclick="showTab('homeworkEvalTab')"><i class="fas fa-tasks"></i> الواجبات</button>
+            <button class="tab-button" onclick="showTab('libraryTab')"><i class="fas fa-book-open"></i> المكتبة</button>
         </div>
         
         <div id="announcementsTab" class="tab-content">
@@ -58,7 +85,7 @@
         </div>
         <div id="gradesTab" class="tab-content">
             <h2>كشف الدرجات</h2>
-            <div id="gradesContainer"><p>جاري تحميل الدرجات...</p></div>
+            <div id="gradesContainer" class="table-responsive"><p>جاري تحميل الدرجات...</p></div>
         </div>
         <div id="absencesTab" class="tab-content">
             <h2>سجل الغياب</h2>
@@ -68,7 +95,7 @@
         <div id="schedulesMainTab" class="tab-content">
             <h2>الجداول الدراسية</h2>
             <h3><i class="fas fa-calendar-week"></i> جدولي الأسبوعي</h3>
-            <div id="weeklyScheduleContainer"><p>جاري تحميل الجدول...</p></div>
+            <div id="weeklyScheduleContainer" class="table-responsive"><p>جاري تحميل الجدول...</p></div>
             <hr style="margin: 30px 0;">
             <h3><i class="fas fa-tasks"></i> جداول الامتحانات</h3>
             <div id="examSchedulesContainer"><p>جاري تحميل جداول الامتحانات...</p></div>
@@ -80,7 +107,7 @@
             <div id="homeworkContainer" class="card-container"><p>جاري تحميل الواجبات...</p></div>
             <hr style="margin: 30px 0;">
             <h3><i class="fas fa-user-graduate"></i> سجل التقييم اليومي</h3>
-            <div id="evaluationsContainer"><p>جاري تحميل التقييمات...</p></div>
+            <div id="evaluationsContainer" class="table-responsive"><p>جاري تحميل التقييمات...</p></div>
         </div>
 
         <div id="libraryTab" class="tab-content">
